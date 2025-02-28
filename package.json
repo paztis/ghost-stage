@@ -5,7 +5,7 @@
   "repository": "https://github.com/prophecy1345/ghost-stage",
   "publisher": "ghost-stage",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.97.0"
   },
@@ -13,6 +13,7 @@
     "Other"
   ],
   "activationEvents": [
+      "onStartupFinished",
       "workspaceContains:.git"
   ],
   "main": "./out/extension.js",
