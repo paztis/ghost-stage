@@ -13,8 +13,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 // Function to add a file to Git and update the UI
 function addFileToGit(filePath: string) {
-    console.log(`File created: ${filePath}`);
-
     // Get the workspace folder
     const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!workspaceFolder) {
