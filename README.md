@@ -1,5 +1,7 @@
 # 👻 Ghost Stage
 
+![Ghost Stage Logo](images/icon.png)
+
 🚀 **Ghost Stage** is a lightweight VS Code extension that **automatically stages new files in Git** as soon as they are created.  
 No need to manually run `git add` in the terminal—just create a file, and it will instantly appear in the **staged changes** of Source Control.
 

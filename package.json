@@ -5,6 +5,7 @@
   "repository": "https://github.com/prophecy1345/ghost-stage",
   "publisher": "ghost-stage",
   "license": "MIT",
+  "icon": "images/icon.png",
   "version": "1.0.1",
   "engines": {
     "vscode": "^1.97.0"
