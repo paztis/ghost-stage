@@ -10,7 +10,7 @@ No need to manually run `git add` in the terminal—just create a file, and it w
 - 🖥️ **Instant Git refresh**, so staged files immediately appear in VS Code's Source Control.
 - 🔔 **Clear notifications** when files are staged.
 - ⚡ **No setup required**, just install and go.
-
+∏
 ## 🚀 How It Works
 1. Install **Ghost Stage**.
 2. Open a **Git-tracked project** in VS Code.

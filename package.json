@@ -6,25 +6,68 @@
   "publisher": "ghost-stage",
   "license": "MIT",
   "icon": "images/icon.png",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "engines": {
     "vscode": "^1.97.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "SCM Providers"
+  ],
+  "keywords": [
+    "git",
+    "stage",
+    "add",
+    "automatic",
+    "files"
   ],
   "activationEvents": [
-      "onStartupFinished",
-      "workspaceContains:.git"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "ghost-stage.helloWorld",
-        "title": "Hello World"
+        "command": "ghost-stage.enable",
+        "title": "Enable Ghost Stage"
+      },
+      {
+        "command": "ghost-stage.disable",
+        "title": "Disable Ghost Stage"
+      },
+      {
+        "command": "ghost-stage.status",
+        "title": "Show Ghost Stage Status"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "ghost-stage.enable",
+          "when": "workspaceHasGit"
+        },
+        {
+          "command": "ghost-stage.disable",
+          "when": "workspaceHasGit"
+        },
+        {
+          "command": "ghost-stage.status",
+          "when": "workspaceHasGit"
+        }
+      ],
+      "scm/title": [
+        {
+          "command": "ghost-stage.enable",
+          "group": "navigation",
+          "when": "workspaceHasGit"
+        },
+        {
+          "command": "ghost-stage.disable",
+          "group": "navigation",
+          "when": "workspaceHasGit"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
