@@ -3,6 +3,7 @@
   "displayName": "Ghost Stage",
   "description": "Automatically stages new files in Git",
   "repository": "https://github.com/prophecy1345/ghost-stage",
+  "publisher": "ghost-stage",
   "license": "MIT",
   "version": "1.0.0",
   "engines": {
