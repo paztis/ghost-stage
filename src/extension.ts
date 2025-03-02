@@ -37,34 +37,34 @@ export function activate(context: vscode.ExtensionContext) {
             const status = isEnabled ? 'enabled' : 'disabled';
             vscode.window.showInformationMessage(`Ghost Stage is currently ${status}`);
             outputChannel.appendLine(`Status requested: ${status}`);
-            
-            if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-                outputChannel.appendLine(`Number of workspace folders: ${vscode.workspace.workspaceFolders.length}`);
-                
-                vscode.workspace.workspaceFolders.forEach(folder => {
-                    outputChannel.appendLine(`Workspace: ${folder.uri.fsPath}`);
-                    checkIfGitRepository(folder.uri.fsPath);
-                });
-            } else {
-                outputChannel.appendLine('No workspace folders found');
-            }
-        })
-    );
+        }),
 
-    context.subscriptions.push(
         vscode.workspace.onDidChangeWorkspaceFolders(event => {
             outputChannel.appendLine('Workspace folders changed');
-            
             event.removed.forEach(folder => {
                 outputChannel.appendLine(`Workspace removed: ${folder.uri.fsPath}`);
             });
-            
             event.added.forEach(folder => {
                 outputChannel.appendLine(`Workspace added: ${folder.uri.fsPath}`);
                 if (isEnabled) {
                     setupWatcherForWorkspace(context, folder.uri.fsPath);
                 }
             });
+        }),
+
+        vscode.workspace.onDidSaveTextDocument(document => {
+            if (isEnabled) {
+                const filePath = document.fileName;
+                const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
+                
+                if (workspaceFolder) {
+                    const workspacePath = workspaceFolder.uri.fsPath;
+                    outputChannel.appendLine(`File saved: ${filePath}`);
+                    addFileToGit(filePath, workspacePath);
+                } else {
+                    outputChannel.appendLine(`Skipped saving: No workspace found for ${filePath}`);
+                }
+            }
         })
     );
 
@@ -173,58 +173,27 @@ function disposeWatcher() {
 }
 
 function addFileToGit(filePath: string, workspaceFolder: string) {
-    outputChannel.appendLine(`Checking Git status for: ${filePath} in workspace ${workspaceFolder}`);
-    
-    const relativePath = path.relative(workspaceFolder, filePath);
-    
-    exec(`git status --porcelain "${relativePath}"`, { cwd: workspaceFolder }, (error, stdout, stderr) => {
-        if (error) {
-            outputChannel.appendLine(`Git status error: ${error.message} ${stderr}`);
+    outputChannel.appendLine(`Staging file: ${filePath}`);
+
+    exec(`git rev-parse --show-toplevel`, { cwd: workspaceFolder }, (rootError, gitRoot, rootStderr) => {
+        if (rootError) {
+            outputChannel.appendLine(`Error finding Git root: ${rootStderr}`);
             return;
         }
 
-        outputChannel.appendLine(`Git status output: "${stdout}"`);
-        
-        if (!stdout.trim()) {
-            outputChannel.appendLine('File might be ignored by Git or not tracked');
-            return;
-        }
-        
-        const isNewFile = stdout.trim().startsWith('??');
-        
-        if (!isNewFile) {
-            outputChannel.appendLine('File is already tracked or staged, skipping');
-            return;
-        }
+        const gitRepoPath = gitRoot.trim();
+        const relativePath = path.relative(gitRepoPath, filePath);
 
         outputChannel.appendLine(`Adding file to Git: ${relativePath}`);
-        
-        exec(`git add "${relativePath}"`, { cwd: workspaceFolder }, (addError, addStdout, addStderr) => {
+        exec(`git add "${relativePath}"`, { cwd: gitRepoPath }, (addError, addStdout, addStderr) => {
             if (addError) {
-                outputChannel.appendLine(`Git add error: ${addError.message} ${addStderr}`);
+                outputChannel.appendLine(`Git add error: ${addStderr}`);
                 vscode.window.showErrorMessage(`Error adding file to Git: ${addStderr}`);
                 return;
             }
 
-            outputChannel.appendLine('File added successfully, refreshing Git view');
-            
-            exec(`git status --porcelain "${relativePath}"`, { cwd: workspaceFolder }, (checkError, checkStdout, checkStderr) => {
-                if (checkError) {
-                    outputChannel.appendLine(`Error checking Git status after add: ${checkStderr}`);
-                    return;
-                }
-                
-                outputChannel.appendLine(`Git status after add: "${checkStdout}"`);
-                const isAdded = checkStdout.trim().startsWith('A');
-                
-                if (isAdded) {
-                    vscode.commands.executeCommand('git.refresh');
-                    vscode.window.showInformationMessage(`File staged (A): ${relativePath}`);
-                    outputChannel.appendLine(`File successfully staged: ${relativePath}`);
-                } else {
-                    outputChannel.appendLine(`File not staged properly: ${relativePath}, status: ${checkStdout}`);
-                }
-            });
+            outputChannel.appendLine(`File staged successfully: ${relativePath}`);
+            vscode.commands.executeCommand('git.refresh');
         });
     });
 }
