@@ -188,7 +188,6 @@ function addFileToGit(filePath: string, workspaceFolder: string) {
         exec(`git add "${relativePath}"`, { cwd: gitRepoPath }, (addError, addStdout, addStderr) => {
             if (addError) {
                 outputChannel.appendLine(`Git add error: ${addStderr}`);
-                vscode.window.showErrorMessage(`Error adding file to Git: ${addStderr}`);
                 return;
             }
 
