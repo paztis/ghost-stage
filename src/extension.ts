@@ -7,7 +7,7 @@ let outputChannel: vscode.OutputChannel;
 
 export function activate(context: vscode.ExtensionContext) {
     outputChannel = vscode.window.createOutputChannel('Ghost Stage');
-    outputChannel.show();
+    // outputChannel.show();
     outputChannel.appendLine('Ghost Stage extension activated!');
     console.log('Ghost Stage extension activated!');
 
